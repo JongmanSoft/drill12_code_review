@@ -1,6 +1,8 @@
 import random
 import math
 import game_framework
+import game_world
+
 
 from pico2d import *
 
@@ -32,6 +34,7 @@ class Zombie:
         self.load_images()
         self.frame = random.randint(0, 9)
         self.dir = random.choice([-1,1])
+        self.size = 2
 
 
     def update(self):
@@ -47,11 +50,18 @@ class Zombie:
 
     def draw(self):
         if self.dir < 0:
-            Zombie.images['Walk'][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 200, 200)
+            Zombie.images['Walk'][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 100*self.size, 100*self.size)
         else:
-            Zombie.images['Walk'][int(self.frame)].draw(self.x, self.y, 200, 200)
-
+            Zombie.images['Walk'][int(self.frame)].draw(self.x, self.y, 100*self.size, 100*self.size)
+        draw_rectangle(*self.get_bb())  # *를 붙이면 튜플을 풀어헤칠 수 있다 *을 쓰지않는다면 self.get_bb()[0]
 
     def handle_event(self, event):
         pass
 
+    def get_bb(self):
+        return self.x - self.size*50, self.y - self.size*50, self.x + self.size*50, self.y + self.size*50
+
+    def handle_collision(self, group, other):
+        if group == 'zombie:ball':
+            if self.size == 2: self.size = 1
+            else: game_world.remove_object(self)

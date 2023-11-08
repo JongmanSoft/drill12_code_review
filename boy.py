@@ -196,6 +196,7 @@ class Boy:
             self.ball_count -= 1
             ball = Ball(self.x, self.y, self.face_dir*10)
             game_world.add_object(ball)
+            game_world.add_collision_pair('zombie:ball', None, ball)
 
     def update(self):
         self.state_machine.update()
@@ -206,5 +207,15 @@ class Boy:
     def draw(self):
         self.state_machine.draw()
         self.font.draw(self.x-10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
+        draw_rectangle(*self.get_bb()) #*를 붙이면 튜플을 풀어헤칠 수 있다 *을 쓰지않는다면 self.get_bb()[0]
 
     # fill here
+    def get_bb(self):
+        if self.state_machine.cur_state == Sleep and self.face_dir == 0 : return self.x - 70, self.y - 40, self.x + 20, self.y +0
+        elif self.state_machine.cur_state == Sleep and self.face_dir == -1:return self.x - 20, self.y - 40, self.x +70, self.y +0
+        else : return self.x - 20, self.y - 40, self.x + 20, self.y + 40
+
+    def handle_collision(self, group, other):
+        if group == 'boy:ball': #볼과 충돌한 경우
+            self.ball_count += 1
+        if group == 'zombie:boy': game_framework.quit()

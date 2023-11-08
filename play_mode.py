@@ -24,6 +24,7 @@ def handle_events():
 def init():
     global grass
     global boy
+    global zombies
 
     running = True
 
@@ -33,8 +34,24 @@ def init():
     boy = Boy()
     game_world.add_object(boy, 1)
 
-    # fill here
+    zombies = [Zombie() for _ in  range(5)]
+    game_world.add_objects(zombies,1)
+    for zombie in zombies:
+        game_world.add_collision_pair('zombie:ball', zombie, None)
 
+
+    # fill here
+    global balls
+    balls =[]
+    game_world.add_objects(balls, 1)
+    game_world.add_collision_pair('boy:ball', boy, None)
+
+    for zombie in zombies:
+        game_world.add_collision_pair('zombie:ball', zombie, None)
+
+    #충돌 검사 필요상황을 등록
+    for zombie in zombies:
+        game_world.add_collision_pair('zombie:boy', zombie, boy)
 
 
 def finish():
@@ -44,7 +61,13 @@ def finish():
 
 def update():
     game_world.update()
-    # fill here
+    # for ball in balls.copy(): #remove를 해주기 때문에 카피를 해줌
+    #     if game_world.collide(boy, ball):
+    #         print("COLLISION boy:ball")
+    #         boy.ball_count += 1
+    #         game_world.remove_object(ball)
+    #         balls.remove(ball)
+    game_world.handle_collisions()
 
 def draw():
     clear_canvas()
